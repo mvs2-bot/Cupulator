@@ -1,1 +1,404 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Cupulator" />
+  <title>Cupulator – Cups umrechnen</title>
+  <meta name="description" content="Rezeptangaben schnell umrechnen: Gramm und Milliliter in Cups, EL und TL – offline nutzbar." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Cupulator" />
+  <meta property="og:title" content="Cupulator – Cups umrechnen" />
+  <meta property="og:description" content="Gramm und Milliliter schnell in Cups umrechnen, und zurück." />
+  <meta property="og:url" content="https://mvs2-bot.github.io/Cupulator/" />
+  <meta property="og:image" content="https://mvs2-bot.github.io/Cupulator/icons/icon-512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:locale" content="de_DE" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="manifest.json" />
+  <script>
+    // Darstellung gilt für alle Seiten (overall-theme), vor dem ersten Rendern setzen.
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('overall-theme'); } catch (e) {}
+      if (t !== 'dark' && t !== 'light') t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --surface-2: #f2f2f7;
+      --text: #1d1d1f;
+      --text-secondary: #48484d;
+      --border: rgba(0, 0, 0, 0.08);
+      --accent: #ff9500;
+      --accent-soft: rgba(255, 149, 0, 0.14);
+      --accent-text: #b36200;
+      --on-accent: #ffffff;
+      --green: #34c759;
+      --green-soft: rgba(52, 199, 89, 0.12);
+      --green-text: #1d7a38;
+      --danger: #ff3b30;
+      --glass: rgba(255, 255, 255, 0.85);
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      --radius: 14px;
+      /* Namen, die ios-nav.js erwartet */
+      --card: var(--surface);
+      --card-hover: var(--surface-2);
+    }
+    [data-theme="dark"] {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --surface-2: #2c2c2e;
+      --text: #f5f5f7;
+      --text-secondary: #b4b4b9;
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #ff9f0a;
+      --accent-soft: rgba(255, 159, 10, 0.16);
+      --accent-text: #ffb340;
+      --green: #30d158;
+      --green-soft: rgba(48, 209, 88, 0.16);
+      --green-text: #30d158;
+      --danger: #ff453a;
+      --glass: rgba(28, 28, 30, 0.85);
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { font-size: 16.5px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    body.sheet-open { overflow: hidden; }
+    button, input { font-family: inherit; font-size: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* Kopf */
+    .top-header {
+      position: sticky; top: 0; z-index: 1000;
+      padding-top: env(safe-area-inset-top, 0px);
+      background: var(--glass);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+    .top-header-inner { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 16px; }
+    .top-bar-row { height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-logo { width: 36px; height: 36px; border-radius: 9px; flex: none; display: block; }
+    .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; white-space: nowrap; }
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .theme-toggle:active { transform: scale(0.92); }
+    .theme-toggle svg { width: 17px; height: 17px; }
+
+    /* Inhalt */
+    .container { width: 100%; max-width: 720px; margin: 0 auto; padding: 14px 16px; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .view > * + * { margin-top: 14px; }
+
+    .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 16px; }
+    .card > * + * { margin-top: 12px; }
+    .lbl { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+    h2 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+    .muted { color: var(--text-secondary); font-size: 14px; }
+
+    /* iOS-Segmente */
+    .seg { display: flex; gap: 2px; padding: 2px; background: var(--surface-2); border-radius: 11px; }
+    .seg-btn {
+      flex: 1; min-height: 44px; padding: 0 8px; border: 0; border-radius: 9px; background: none;
+      font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer;
+    }
+    .seg-btn[aria-pressed="true"] { background: var(--surface); color: var(--accent-text); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+    [data-theme="dark"] .seg-btn[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); box-shadow: none; }
+    .seg-sm .seg-btn { min-height: 40px; font-size: 13px; }
+
+    /* Eingabe */
+    .amount {
+      width: 100%; min-height: 56px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--surface-2); font-size: 30px; font-weight: 700; letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .amount[aria-invalid="true"] { border-color: var(--danger); }
+    .amount::placeholder { color: var(--text-secondary); opacity: .5; }
+    .fracs { display: flex; gap: 6px; }
+    .fracs[hidden] { display: none; }
+    .frac-btn {
+      flex: 1; min-height: 44px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface-2);
+      font-size: 20px; cursor: pointer;
+    }
+    .frac-btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+    [data-theme="dark"] .frac-btn[aria-pressed="true"] { color: var(--accent); }
+    .ing-btn {
+      width: 100%; min-height: 48px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); cursor: pointer; text-align: left; font-weight: 600;
+    }
+    .ing-btn svg { width: 18px; height: 18px; flex: none; fill: none; stroke: var(--text-secondary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Ergebnis */
+    .res-main { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; font-variant-numeric: tabular-nums; color: var(--accent-text); overflow-wrap: anywhere; }
+    [data-theme="dark"] .res-main { color: var(--accent); }
+    .res-sub { font-size: 14px; color: var(--text-secondary); min-height: 1.4em; font-variant-numeric: tabular-nums; }
+    .link { border: 0; background: none; color: var(--accent-text); font-size: 13px; font-weight: 600; cursor: pointer; padding: 8px 0; min-height: 44px; }
+    [data-theme="dark"] .link { color: var(--accent); }
+    .btn-primary {
+      width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: var(--accent); color: var(--on-accent);
+      font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .btn-primary:disabled { opacity: .4; cursor: default; }
+    .btn-ghost {
+      min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-ghost.danger { color: var(--danger); }
+
+    /* Rezept-Liste */
+    .r-list { list-style: none; }
+    .r-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border); }
+    .r-row:first-child { border-top: 0; }
+    .r-txt { flex: 1; min-width: 0; }
+    .r-name { font-weight: 600; font-size: 15px; }
+    .r-val { font-size: 14px; color: var(--text-secondary); overflow-wrap: anywhere; }
+    .icon-btn { width: 44px; height: 44px; border: 0; background: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex: none; }
+    .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: var(--text-secondary); stroke-width: 2; stroke-linecap: round; }
+    .r-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Backofen */
+    details.card > summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; list-style: none; }
+    details.card > summary::-webkit-details-marker { display: none; }
+    details.card > summary::after { content: "›"; margin-left: auto; font-size: 22px; color: var(--text-secondary); transition: transform .15s; }
+    details.card[open] > summary::after { transform: rotate(90deg); }
+    .temp-in { font-size: 24px; min-height: 52px; }
+
+    /* Sheet */
+    .sheet-wrap { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: flex-end; justify-content: center; }
+    .sheet-wrap[hidden] { display: none; }
+    .sheet-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.4); }
+    .sheet {
+      position: relative; width: 100%; max-width: 720px; max-height: 85vh; max-height: 85dvh;
+      display: flex; flex-direction: column; gap: 10px;
+      background: var(--surface); border-radius: 22px 22px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; }
+    .search { width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
+    .sheet-list { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    .group-h { font-size: 13px; font-weight: 700; color: var(--text-secondary); padding: 14px 4px 4px; }
+    .opt { width: 100%; min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: none; text-align: left; font-size: 15px; cursor: pointer; }
+    .opt:active, .opt:hover { background: var(--surface-2); }
+    .opt[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+    [data-theme="dark"] .opt[aria-pressed="true"] { color: var(--accent); }
+    .empty { padding: 16px 4px; color: var(--text-secondary); }
+
+    /* Spickzettel */
+    .thead, .trow { display: grid; grid-template-columns: minmax(0, 2.3fr) repeat(4, minmax(0, 1fr)); gap: 2px; align-items: center; }
+    .thead { font-size: 11px; font-weight: 700; color: var(--text-secondary); padding: 0 8px; }
+    .thead span + span, .tv { text-align: right; }
+    .trow { width: 100%; min-height: 44px; padding: 4px 8px; border: 0; border-top: 1px solid var(--border); background: none; text-align: left; font-size: 13px; cursor: pointer; }
+    .trow:active { background: var(--surface-2); }
+    .tn { font-weight: 600; overflow-wrap: break-word; hyphens: auto; font-size: 12.5px; line-height: 1.25; }
+    .tv { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+    .table-card { padding: 8px 0 8px; }
+    .table-card .group-h { padding-left: 8px; }
+    .facts { list-style: none; font-size: 14px; }
+    .facts li { padding: 8px 0; border-top: 1px solid var(--border); }
+    .facts li:first-child { border-top: 0; }
+
+    .pill { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--green-soft); color: var(--green-text); font-size: 13px; font-weight: 600; }
+    .pill[hidden] { display: none; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    /* Schwebende Tab-Leiste */
+    .tabbar {
+      position: fixed; z-index: 45;
+      left: calc(12px + env(safe-area-inset-left, 0px)); right: calc(12px + env(safe-area-inset-right, 0px));
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      max-width: 540px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      height: 62px; padding: 0 6px; border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 8px 28px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.06);
+    }
+    [data-theme="dark"] .tabbar { background: #2c2c2e; box-shadow: 0 8px 28px rgba(0,0,0,.6), 0 0 0 .5px rgba(255,255,255,.1); }
+    .tabbar button {
+      position: relative; z-index: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      padding: 0; border: 0; background: none; font-size: 11px; font-weight: 500; color: var(--text); cursor: pointer;
+    }
+    .tabbar button .ic { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .tabbar button[aria-current="page"]::before { content: ""; position: absolute; inset: 7px 6px; z-index: -1; border-radius: 16px; background: var(--accent-soft); }
+    .tabbar button[aria-current="page"] { color: var(--accent-text); font-weight: 600; }
+    [data-theme="dark"] .tabbar button[aria-current="page"] { color: var(--accent); }
+    .tabbar button[aria-current="page"] .ic { stroke-width: 2.2; }
+  </style>
+</head>
+<body>
+  <header class="top-header">
+    <div class="top-header-inner">
+      <div class="top-bar-row">
+        <div class="brand">
+          <img class="brand-logo" src="icon.svg" alt="" />
+          <h1>Cupulator</h1>
+        </div>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Farbschema wechseln" title="Hell / Dunkel wechseln">
+          <svg id="iconSun" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Rechner -->
+    <section class="view active" id="view-calc" aria-label="Rechner">
+      <div class="seg" id="dirSeg" role="group" aria-label="Richtung">
+        <button type="button" class="seg-btn" data-dir="toCups" aria-pressed="true">g/ml → Cups</button>
+        <button type="button" class="seg-btn" data-dir="fromCups" aria-pressed="false">Cups → g/ml</button>
+      </div>
+
+      <div class="card">
+        <div>
+          <label class="lbl" for="amount" id="amountLabel">Menge</label>
+          <input id="amount" class="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0" enterkeyhint="done" />
+        </div>
+        <div class="seg seg-sm" id="unitSeg" role="group" aria-label="Einheit"></div>
+        <div class="fracs" id="fracRow" role="group" aria-label="Bruchteil" hidden></div>
+        <div>
+          <span class="lbl" id="ingLbl">Zutat</span>
+          <button type="button" id="ingBtn" class="ing-btn" aria-haspopup="dialog" aria-labelledby="ingLbl ingName">
+            <span id="ingName"></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div aria-live="polite" aria-atomic="true">
+          <div class="res-main" id="resMain">–</div>
+          <div class="res-sub" id="resSub"></div>
+        </div>
+        <button type="button" class="link" id="cupLink">US-Cup · ändern</button>
+        <button type="button" class="btn-primary" id="addBtn" disabled>Zum Rezept hinzufügen</button>
+      </div>
+
+      <div class="card" id="recipeCard" hidden>
+        <h2>Rezept-Liste</h2>
+        <ul class="r-list" id="recipeList"></ul>
+        <div class="r-actions">
+          <button type="button" class="btn-ghost" id="copyBtn">Kopieren</button>
+          <button type="button" class="btn-ghost danger" id="clearBtn">Alle löschen</button>
+        </div>
+        <p class="muted">Die Liste wird nicht gespeichert und ist nach dem Neuladen weg.</p>
+      </div>
+
+      <details class="card">
+        <summary>Backofen °F ↔ °C</summary>
+        <div class="seg seg-sm" id="tempSeg" role="group" aria-label="Richtung Temperatur">
+          <button type="button" class="seg-btn" data-t="f2c" aria-pressed="true">°F → °C</button>
+          <button type="button" class="seg-btn" data-t="c2f" aria-pressed="false">°C → °F</button>
+        </div>
+        <div>
+          <label class="lbl" for="tempIn" id="tempLabel">Grad Fahrenheit</label>
+          <input id="tempIn" class="amount temp-in" type="text" inputmode="decimal" autocomplete="off" placeholder="350" />
+        </div>
+        <div aria-live="polite" aria-atomic="true">
+          <div class="res-main" id="tempMain">–</div>
+          <div class="res-sub" id="tempSub"></div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Spickzettel -->
+    <section class="view" id="view-table" aria-label="Spickzettel">
+      <div>
+        <label class="sr" for="tableSearch">Zutat suchen</label>
+        <input id="tableSearch" class="search" type="search" placeholder="Zutat suchen …" autocomplete="off" />
+      </div>
+      <div class="card table-card">
+        <div class="thead" aria-hidden="true"><span>Zutat (g)</span><span>1 Cup</span><span>½ Cup</span><span>¼ Cup</span><span>1 EL</span></div>
+        <div id="tableList"></div>
+      </div>
+      <div class="card">
+        <h2>Maße</h2>
+        <ul class="facts" id="facts"></ul>
+      </div>
+    </section>
+
+    <!-- Infos -->
+    <section class="view" id="view-info" aria-label="Infos">
+      <div class="card">
+        <h2>Cup-Standard</h2>
+        <div class="seg" id="cupSeg" role="group" aria-label="Cup-Standard"></div>
+        <p class="muted">Gilt für alle Berechnungen und den Spickzettel. Wird auf diesem Gerät gespeichert.</p>
+      </div>
+      <div class="card">
+        <h2>Hinweis</h2>
+        <p class="muted">Alle Werte sind Richtwerte. Die Tabelle rechnet mit Mehl, das locker eingefüllt und abgestrichen wird. Dichten schwanken je nach Marke, Feuchtigkeit und Packung.</p>
+      </div>
+      <div class="card">
+        <span class="pill" id="offlineBadge" hidden>✓ Offline bereit</span>
+        <p><a class="link" href="/" style="display:inline-flex;align-items:center;text-decoration:none">Zum Dashboard</a></p>
+        <p class="muted" id="version"></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Zutaten-Sheet -->
+  <div class="sheet-wrap" id="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-head">
+        <h2 id="sheetTitle">Zutat wählen</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <label class="sr" for="ingSearch">Zutat suchen</label>
+      <input id="ingSearch" class="search" type="search" placeholder="Suchen …" autocomplete="off" />
+      <div class="sheet-list" id="ingList"></div>
+    </div>
+  </div>
+
+  <nav class="tabbar" aria-label="Navigation">
+    <button type="button" data-target="view-calc" aria-current="page">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg>
+      Rechner
+    </button>
+    <button type="button" data-target="view-table">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M9 4v16"/></svg>
+      Spickzettel
+    </button>
+    <button type="button" data-target="view-info">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      Infos
+    </button>
+  </nav>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="shared/ios-nav.js" data-bottom="92" defer></script>
+</body>
+</html>
