@@ -2,18 +2,35 @@
   <defs>
     <clipPath id="rounded-bg"><rect width="512" height="512" rx="112" ry="112"/></clipPath>
     <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffa81f"/>
-      <stop offset="100%" stop-color="#ff8400"/>
+      <stop offset="0%" stop-color="#cc6a12"/>
+      <stop offset="100%" stop-color="#97440b"/>
     </linearGradient>
-  </defs>
-  <g clip-path="url(#rounded-bg)">
-    <rect width="512" height="512" fill="url(#bg-grad)"/>
-    <!-- Messbecher mit Henkel und Skalenstrichen -->
-    <g transform="translate(-28 -9)" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <linearGradient id="fade" gradientUnits="userSpaceOnUse" x1="256" y1="256" x2="560" y2="560">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0.15"/>
+    </linearGradient>
+    <mask id="fade-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="url(#fade)"/></mask>
+    <g id="cup" transform="translate(-28 -9)">
+      <g fill="none" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" stroke="#000">
       <path d="M140 150H372"/>
       <path d="M160 150 184 366a28 28 0 0 0 28 24h88a28 28 0 0 0 28-24L352 150"/>
       <path d="M348 200H392a36 36 0 0 1 36 36v8a36 36 0 0 1-36 36H338"/>
       <path d="M214 228h56M210 290h34M218 342h34"/>
+    </g>
+    </g>
+  </defs>
+  <g clip-path="url(#rounded-bg)">
+    <rect width="512" height="512" fill="url(#bg-grad)"/>
+    <!-- Langschatten (45°) wie bei den anderen Apps -->
+    <g opacity="0.25" mask="url(#fade-mask)"><use href="#cup" x="2" y="2"/><use href="#cup" x="5" y="5"/><use href="#cup" x="8" y="8"/><use href="#cup" x="11" y="11"/><use href="#cup" x="14" y="14"/><use href="#cup" x="17" y="17"/><use href="#cup" x="20" y="20"/><use href="#cup" x="23" y="23"/><use href="#cup" x="26" y="26"/><use href="#cup" x="29" y="29"/><use href="#cup" x="32" y="32"/><use href="#cup" x="35" y="35"/><use href="#cup" x="38" y="38"/><use href="#cup" x="41" y="41"/><use href="#cup" x="44" y="44"/><use href="#cup" x="47" y="47"/><use href="#cup" x="50" y="50"/><use href="#cup" x="53" y="53"/><use href="#cup" x="56" y="56"/><use href="#cup" x="59" y="59"/><use href="#cup" x="62" y="62"/><use href="#cup" x="65" y="65"/><use href="#cup" x="68" y="68"/><use href="#cup" x="71" y="71"/><use href="#cup" x="74" y="74"/><use href="#cup" x="77" y="77"/><use href="#cup" x="80" y="80"/><use href="#cup" x="83" y="83"/><use href="#cup" x="86" y="86"/><use href="#cup" x="89" y="89"/><use href="#cup" x="92" y="92"/><use href="#cup" x="95" y="95"/><use href="#cup" x="98" y="98"/><use href="#cup" x="101" y="101"/><use href="#cup" x="104" y="104"/><use href="#cup" x="107" y="107"/><use href="#cup" x="110" y="110"/><use href="#cup" x="113" y="113"/><use href="#cup" x="116" y="116"/><use href="#cup" x="119" y="119"/><use href="#cup" x="122" y="122"/><use href="#cup" x="125" y="125"/><use href="#cup" x="128" y="128"/><use href="#cup" x="131" y="131"/><use href="#cup" x="134" y="134"/><use href="#cup" x="137" y="137"/><use href="#cup" x="140" y="140"/><use href="#cup" x="143" y="143"/><use href="#cup" x="146" y="146"/><use href="#cup" x="149" y="149"/><use href="#cup" x="152" y="152"/><use href="#cup" x="155" y="155"/><use href="#cup" x="158" y="158"/><use href="#cup" x="161" y="161"/><use href="#cup" x="164" y="164"/><use href="#cup" x="167" y="167"/><use href="#cup" x="170" y="170"/><use href="#cup" x="173" y="173"/><use href="#cup" x="176" y="176"/><use href="#cup" x="179" y="179"/><use href="#cup" x="182" y="182"/><use href="#cup" x="185" y="185"/><use href="#cup" x="188" y="188"/><use href="#cup" x="191" y="191"/><use href="#cup" x="194" y="194"/><use href="#cup" x="197" y="197"/><use href="#cup" x="200" y="200"/><use href="#cup" x="203" y="203"/><use href="#cup" x="206" y="206"/><use href="#cup" x="209" y="209"/><use href="#cup" x="212" y="212"/><use href="#cup" x="215" y="215"/><use href="#cup" x="218" y="218"/><use href="#cup" x="221" y="221"/><use href="#cup" x="224" y="224"/><use href="#cup" x="227" y="227"/><use href="#cup" x="230" y="230"/><use href="#cup" x="233" y="233"/><use href="#cup" x="236" y="236"/><use href="#cup" x="239" y="239"/><use href="#cup" x="242" y="242"/><use href="#cup" x="245" y="245"/><use href="#cup" x="248" y="248"/><use href="#cup" x="251" y="251"/><use href="#cup" x="254" y="254"/><use href="#cup" x="257" y="257"/><use href="#cup" x="260" y="260"/><use href="#cup" x="263" y="263"/><use href="#cup" x="266" y="266"/><use href="#cup" x="269" y="269"/><use href="#cup" x="272" y="272"/><use href="#cup" x="275" y="275"/><use href="#cup" x="278" y="278"/><use href="#cup" x="281" y="281"/><use href="#cup" x="284" y="284"/><use href="#cup" x="287" y="287"/><use href="#cup" x="290" y="290"/><use href="#cup" x="293" y="293"/><use href="#cup" x="296" y="296"/><use href="#cup" x="299" y="299"/></g>
+    <!-- Messbecher mit Henkel und Skalenstrichen -->
+    <g transform="translate(-28 -9)">
+      <g fill="none" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" stroke="#fff">
+      <path d="M140 150H372"/>
+      <path d="M160 150 184 366a28 28 0 0 0 28 24h88a28 28 0 0 0 28-24L352 150"/>
+      <path d="M348 200H392a36 36 0 0 1 36 36v8a36 36 0 0 1-36 36H338"/>
+      <path d="M214 228h56M210 290h34M218 342h34"/>
+    </g>
     </g>
   </g>
 </svg>
